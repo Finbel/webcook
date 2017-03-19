@@ -27,6 +27,10 @@ h1, h2, h3, h4, .lobster {
     font-size: 16pt;
 }
 
+.small {
+    font-size: 13pt;
+}
+
 td {
     font-family: 'Roboto', sans-serif;
 }
@@ -82,7 +86,7 @@ th {
     color: #0DFF00;
 }
 
-.title {
+.lemonada {
     font-family: 'Lemonada';
 }
 

@@ -4,6 +4,6 @@
 	<!-- List all the recepies belonging to this users history -->
 	{% for recipe in history %}
 		<!-- Each recipe is a link to details on that recipe -->
-		<h1><a href="{% url 'history_details' pk=recipe.pk %}">{{ recipe.recipe }}, {{ recipe.servings }} servings, {{ recipe.created_date }}</a></h1>
+		<h1><a href="{% url 'history_details' pk=recipe.pk %}">{{ recipe.recipe }}, {{ recipe.servings }} servings, {{ recipe.created_date|date:"M d, Y" }}</a></h1>
 	{% endfor %}
 {% endblock %}

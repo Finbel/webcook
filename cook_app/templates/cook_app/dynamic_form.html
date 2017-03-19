@@ -4,13 +4,13 @@
 <form method="post" action="">
     {% csrf_token %}
     <!-- recipe name -->
-    <label>Recipe Name</label>
+    <label class="lemonada medium">Recipe Name</label>
     {{ recipe_form.recipe_name }}
     <!-- Number of servings -->
-    <label>Servings</label>
+    <label class="lemonada medium">Servings</label>
     {{ recipe_form.servings }}
     <!-- A description of the recipe -->
-    <br><label>Description</label><br>
+    <br><label class="lemonada medium">Description</label><br>
     {{ recipe_form.description }}
 
     <!-- A formset of a variable number of ingredient_forms -->

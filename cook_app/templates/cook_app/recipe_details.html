@@ -1,7 +1,7 @@
 {% extends 'cook_app/base.html' %}
 {% load staticfiles %}
 {% block content %}
-<span class="lobster large">Name: </span><span class="title medium">{{recipe_structure.name}}</span><br>
+<span class="lobster large">Name: </span><span class="lemonada medium">{{recipe_structure.name}}</span><br>
 <div class="lobster large">Ingredients for {{recipe_structure.servings}} serving:</div>
 
 <table class="table table-bordered">
@@ -42,8 +42,10 @@
 	</tr>
 	</tbody>
 </table>
+<span class="lobster large">Description: </span><br>
+<div class="well lemonada small">{{ recipe_structure.description }}</div>
 <span class="lobster large">Creator: </span> 
-<span class="title medium">{{ recipe_structure.owner }}</span><br>
+<span class="lemonada medium">{{ recipe_structure.owner }}</span><br>
 Servings:
 <form method="post" action="">
 {% csrf_token %}

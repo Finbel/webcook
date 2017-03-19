@@ -2,6 +2,6 @@
 
 {% block content %}
 	{% for ingredient in ingredients %}
-		<h1><a href="{% url 'add_specific_ingredient' pk=ingredient.pk %}">{{ ingredient.ingredient.name }} {{ ingredient.unit.unit }}</a></h1>
+		<h1><a href="{% url 'add_specific_ingredient' pk=ingredient.pk %}">{{ ingredient.ingredient.name }}, {{ ingredient.unit.unit }}</a></h1>
 	{% endfor %}
 {% endblock %}
