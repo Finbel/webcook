@@ -1,4 +1,4 @@
-from .forms import RecipeIngredientForm, RecipeForm, CalorieForm, ServingsForm, CommentForm
+from .forms import RecipeIngredientForm, RecipeForm, CalorieForm, ServingsForm, CommentForm, SpecificCalorieForm
 from .models import Recipe, Ingredient, RecipeIngredient, Unit, RecipeOwner, IngredientUnitToCal, UserHistory, RecipeComment
 from django.contrib.auth import login
 from django.http import HttpResponseRedirect
@@ -27,13 +27,11 @@ def get_recipe_structure(recipe_pk, servings):
 	ingredient_structure = []
 
 	recipe_ingredients = RecipeIngredient.objects.filter(recipe__id=recipe_pk)
-	ingredient_values = recipe_ingredients.values("ingredient")
-	unit_values = recipe_ingredients.values("unit")
-	ingredient_information = IngredientUnitToCal.objects.filter(ingredient__in=ingredient_values, unit__in=unit_values)
 
-	recipe_ingredients.order_by("ingredient__id")
-	ingredient_information.order_by("ingredient__id")
-	ingredient_tuples = zip(recipe_ingredients,ingredient_information)
+	ingredient_tuples = []
+	for recipe_ingredient in recipe_ingredients:
+		converter = IngredientUnitToCal.objects.get(ingredient=recipe_ingredient.ingredient, unit=recipe_ingredient.unit)		
+		ingredient_tuples.append((recipe_ingredient,converter))
 
 	cal = 0
 	cal_per_serving = 0
@@ -41,21 +39,19 @@ def get_recipe_structure(recipe_pk, servings):
 		recipe_ingredient = ingredient_tuple[0]
 		ingred_unit_cal = ingredient_tuple[1]
 		ingredient_name = recipe_ingredient.ingredient.name
+		ingredient_unit = recipe_ingredient.unit.unit
 		if(ingred_unit_cal.ingredient_unit_to_calories != None):
 			ingredient_calories = ingred_unit_cal.ingredient_unit_to_calories*servings
 		else:
 			ingredient_calories = None
 		ingredient_amount = recipe_ingredient.quantity_per_serving*servings
-		ingredient = {"name":ingredient_name,"amount":ingredient_amount,"calories":ingredient_calories}
+		ingredient = {"name":ingredient_name,"amount":ingredient_amount,"unit":ingredient_unit,"calories":ingredient_calories}
 		ingredient_structure.append(ingredient)
 		if(ingredient_calories != None):
 			cal += ingredient_calories/servings
 			cal_per_serving += ingredient_calories 
 	
 	recipe = {"name":name,"owner":owner,"servings":servings,"ingredients":ingredient_structure,"calories":cal,"calories_per_serving":cal_per_serving}
-	print()
-	print(recipe)
-	print()
 	return recipe
 	
 def create_user(request):
@@ -73,19 +69,6 @@ def create_user(request):
 		form = UserCreationForm()
 
 	return render(request, 'cook_app/create_user.html', {'form': form})
-
-def article_form_view(request):
-	ArticleFormSet = formset_factory(ArticleForm, extra=2)
-	if request.method == "POST":
-		formset = ArticleFormSet(request.POST)
-		if formset.is_valid():
-			for form in formset:
-				print()
-				print(form.cleaned_data)
-			return redirect('home')
-	else:
-		formset = ArticleFormSet()
-	return render(request, 'cook_app/test_form.html', {'formset': formset})
 
 def dynamic_form_view(request):
 	IngredientFormSet = formset_factory(RecipeIngredientForm)
@@ -146,7 +129,6 @@ def recipe_details(request, pk):
 			recipe = Recipe.objects.get(id=pk)
 			date = datetime.datetime.now()
 			comment_object = RecipeComment(title=title, comment=comment, recipe=recipe, author=user, published_date=date)
-			print(comment_object)
 			comment_object.save()
 		else:
 			print("it's not valid!")
@@ -155,18 +137,14 @@ def recipe_details(request, pk):
 	serving_form = ServingsForm(initial={'servings': servings})
 
 	comments = RecipeComment.objects.filter(recipe__title=recipe_structure["name"]).order_by("published_date")
-	print(comments)
 	return render(request, 'cook_app/recipe_details.html', {"pk":pk,"comments":comments,'comment_form':comment_form,'serving_form':serving_form,"recipe_structure":recipe_structure})
 
 def history_view(request):
 	history = UserHistory.objects.filter(owner=request.user)
 	return render(request, 'cook_app/history.html', {"history":history})
 
-def use_recipe_view(request):
-	return render(request, 'cook_app/use_recipe.html', {})
-
 def ingredient_list(request):
-	ingredients = IngredientUnitToCal.objects.filter(initialized=False)
+	ingredients = IngredientUnitToCal.objects.filter(ingredient_unit_to_calories=None)
 	return render(request, 'cook_app/ingredient_list.html', {'ingredients' : ingredients})
 
 def add_specific_ingredient(request,pk):
@@ -177,12 +155,11 @@ def add_specific_ingredient(request,pk):
 	if request.method == "POST":
 		form = SpecificCalorieForm(request.POST)
 		if form.is_valid():
-			print(ingredient_unit)
 			kcal = form.cleaned_data['calories']
 			ingredient_unit.initialized = True
 			ingredient_unit.ingredient_unit_to_calories = kcal
 			ingredient_unit.save()
-		return redirect('home')
+		return redirect('ingredient_list')
 	else:
 		form = SpecificCalorieForm(initial={'ingredient_name':ingredient_name,'unit':unit})
 	return render(request, 'cook_app/add_specific_ingredient.html', {"form":form, "ingredient":ingredient})
@@ -226,3 +203,84 @@ def history_details(request, pk):
 	created_date = history.created_date
 	recipe_structure["created_date"] = created_date
 	return render(request, 'cook_app/history_details.html', {"recipe_structure":recipe_structure})
+
+def reset_database(request):
+	
+	Unit.objects.all().delete()
+	Recipe.objects.all().delete()
+	RecipeOwner.objects.all().delete()
+	RecipeIngredient.objects.all().delete()
+	IngredientUnitToCal.objects.all().delete()
+	Ingredient.objects.all().delete()
+
+	units = ["dl","g","pieces","l","teaspoon","pinch","tablespoon","cup"]
+
+	for unit in units:
+		unit_model = Unit(unit=unit) 
+		unit_model.save()
+
+	ingredients = [
+		{"name":"milk","unit":"dl","cal":42},
+		{"name":"butter","unit":"g","cal":190},
+		{"name":"flour","unit":"dl","cal":30},
+		{"name":"sugar","unit":"tablespoon","cal":30},
+		{"name":"egg","unit":"pieces","cal":78},
+		{"name":"void shard","unit":"pinch","cal":None}
+		]
+
+	for ingredient in ingredients:
+		ingredient_model = Ingredient(name=ingredient["name"])
+		ingredient_model.save()
+		unit = ingredient["unit"]
+		unit_model = Unit.objects.get(unit=unit)
+		converter = IngredientUnitToCal(
+			ingredient=ingredient_model,
+			unit=unit_model,
+			ingredient_unit_to_calories=ingredient["cal"]
+			)
+		converter.save()
+
+	recipe = Recipe(title="Wonderful Cookie")
+	recipe.save()
+	for i in range(0,3):
+		ingredient = ingredients[i]
+		ingredient_model = Ingredient.objects.get(name=ingredient["name"])
+		unit = Unit.objects.get(unit=ingredient["unit"])
+		amount = i*7+5
+		recipe_ingredient = RecipeIngredient(
+			quantity_per_serving=amount,
+			recipe=recipe,
+			ingredient=ingredient_model,
+			unit=unit
+			)
+		recipe_ingredient.save()
+
+	owner = RecipeOwner(
+		description="A wonderful cookie, for the entire family",
+		recipe = recipe,
+		owner = request.user
+		)
+	owner.save()
+
+	recipe = Recipe(title="Magnificent Cake")
+	recipe.save()
+	for i in range(3,6):
+		ingredient = ingredients[i]
+		ingredient_model = Ingredient.objects.get(name=ingredient["name"])
+		unit = Unit.objects.get(unit=ingredient["unit"])
+		amount = i*6+8
+		recipe_ingredient = RecipeIngredient(
+			quantity_per_serving=amount,
+			recipe=recipe,
+			ingredient=ingredient_model,
+			unit=unit
+			)
+		recipe_ingredient.save()
+
+	owner = RecipeOwner(
+		description="It takes the cake, it takes the cake I tell you!",
+		recipe = recipe,
+		owner = request.user
+		)
+	owner.save()
+	return redirect('home')

@@ -85,3 +85,11 @@ th {
 .title {
     font-family: 'Lemonada';
 }
+
+.populate {
+    font-family: Lobster;
+    color: #ffffff;
+    float: left;
+    font-size: 10pt;
+    margin-right: 30px;
+}

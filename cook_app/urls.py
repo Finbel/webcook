@@ -13,4 +13,6 @@ urlpatterns = [
 	url(r'^ingredient_list/$', views.ingredient_list, name='ingredient_list'),
 	url(r'^add_ingredient/(?P<pk>\d+)/$', views.add_specific_ingredient, name='add_specific_ingredient'),
 	url(r'^add_ingredient/$', views.add_ingredient, name='add_ingredient'),
+	# special views for populating the database
+	url(r'^reset_database/$', views.reset_database, name='reset_database'),
 ]

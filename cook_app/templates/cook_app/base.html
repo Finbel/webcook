@@ -21,6 +21,11 @@
         <div class="page-header">
             {% if user.is_authenticated %}
             <!-- These links should only be visable if the user is authenticated -->
+                {% if user.username == "finbel" %}
+                    <!-- Link to populate the database -->
+                    <a href="{% url 'reset_database' %}" class="populate"><span class="glyphicon glyphicon-plus"></span> reset database</a><br>
+                    
+                {% endif %}
                 <!-- a logout-icon -->
                 <a href="{% url 'logout' %}" class="top-menu"><span class="glyphicon glyphicon-log-out"></span> logout</a>
                 <!-- A view of the users history -->
