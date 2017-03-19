@@ -1,0 +1,49 @@
+{% extends 'cook_app/base.html' %}
+
+{% block content %}
+<span class="lobster large">Name: </span><span class="title medium">{{recipe_structure.name}}</span><br>
+<div class="lobster large">Ingredients for {{recipe_structure.servings}} serving:</div>
+
+<table class="table table-bordered">
+    <thead>
+    <div class="table_header">
+      <tr>
+        <th>Ingredient</th>
+        <th>amount</th>
+        <th>calories</th>
+      </tr>
+    </div>
+    </thead>
+    <tbody>	
+{% for ingredient in recipe_structure.ingredients %}
+	<tr>
+  		<td>{{ingredient.name}}</td>
+  		<td>{{ingredient.amount|floatformat:2}} {{ingredient.unit}} </td>
+  		<td>
+		{% if ingredient.calories != None %}
+			{{ingredient.calories|floatformat:2}}
+		{% else %}
+			<div class="missing">
+			Kcal-information missing!
+			</div>
+		{% endif %}
+		</td>
+	</tr>
+{% endfor %}
+	<tr>
+		<td/>
+		<td/>
+		<td>sum: {{recipe_structure.calories|floatformat:2}} kcal</td>
+	</tr>
+			<tr>
+		<td/>
+		<td/>
+		<td>serving: {{recipe_structure.calories_per_serving|floatformat:2}} kcal</td>
+	</tr>
+	</tbody>
+</table>
+<span class="lobster large">Creator: </span> 
+<span class="title medium">{{ recipe_structure.owner }}</span><br><br>
+<span class="title medium">Made on 
+{{ recipe_structure.created_date|date:"M d, Y"  }}<br></span>
+{% endblock %}

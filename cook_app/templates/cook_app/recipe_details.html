@@ -1,0 +1,72 @@
+{% extends 'cook_app/base.html' %}
+{% load staticfiles %}
+{% block content %}
+<span class="lobster large">Name: </span><span class="title medium">{{recipe_structure.name}}</span><br>
+<div class="lobster large">Ingredients for {{recipe_structure.servings}} serving:</div>
+
+<table class="table table-bordered">
+    <thead>
+    <div class="table_header">
+      <tr>
+        <th>Ingredient</th>
+        <th>amount</th>
+        <th>calories</th>
+      </tr>
+    </div>
+    </thead>
+    <tbody>	
+{% for ingredient in recipe_structure.ingredients %}
+	<tr>
+  		<td>{{ingredient.name}}</td>
+  		<td>{{ingredient.amount|floatformat:2}} {{ingredient.unit}} </td>
+  		<td>
+		{% if ingredient.calories != None %}
+			{{ingredient.calories|floatformat:2}}
+		{% else %}
+			<div class="missing">
+			Kcal-information missing!
+			</div>
+		{% endif %}
+		</td>
+	</tr>
+{% endfor %}
+	<tr>
+		<td/>
+		<td/>
+		<td>sum: {{recipe_structure.calories|floatformat:2}} kcal</td>
+	</tr>
+			<tr>
+		<td/>
+		<td/>
+		<td>serving: {{recipe_structure.calories_per_serving|floatformat:2}} kcal</td>
+	</tr>
+	</tbody>
+</table>
+<span class="lobster large">Creator: </span> 
+<span class="title medium">{{ recipe_structure.owner }}</span><br>
+Servings:
+<form method="post" action="">
+{% csrf_token %}
+{{serving_form.servings}}
+<input type="submit" value="OK">
+
+<a href="{% url 'save' servings=recipe_structure.servings recipe=recipe_structure.name %}" ><span class="glyphicon glyphicon-floppy-disk"> save to history</span></a>
+</form>
+
+<br>
+Make a comment!
+<form method="post" action="">
+{% csrf_token %}
+    Title: {{comment_form.title}}<br>
+    Comment:<br>
+    {{comment_form.comment}}
+<input type="submit" value="OK">
+
+<br>Comments on this recipe!<br>
+{% for comment in comments %}
+<div class="well">
+	<br>{{comment.title}}
+	<br>{{comment.comment}}
+</div>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends 'cook_app/base.html' %}
+
+{% block content %}
+<form method="post" action="">
+    {% csrf_token %}
+    {{ingredient.0}} <br>
+    {{ form.as_p}}
+    <br>
+<input type="submit" value="OK">
+</form>
+{% if saved %}
+<div class="lobster large">Saved!</div>
+{% endif %}
+{%if unlogged_ingredients > 0 %}
+<!-- A view for ingredients that haven't been logged yet-->
+<a href="{% url 'ingredient_list' %}" type="button" class="btn btn-primary active"><span class="glyphicon glyphicon-warning-sign"></span> <span class="medium"> list of unlogged ingredients</span></a>
+{% endif %}
+{% endblock %}

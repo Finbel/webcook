@@ -1,0 +1,7 @@
+{% extends 'cook_app/base.html' %}
+
+{% block content %}
+	{% for recipe in recipes %}
+		<h1><a href="{% url 'recipe_details' pk=recipe.pk %}">{{ recipe.title }}</a></h1>
+	{% endfor %}
+{% endblock %}

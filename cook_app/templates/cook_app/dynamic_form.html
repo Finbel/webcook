@@ -1,0 +1,38 @@
+{% extends 'cook_app/base.html' %}
+{% load staticfiles %}
+{% block content %}
+<form method="post" action="">
+    {% csrf_token %}
+    <!-- recipe name -->
+    <label>Recipe Name</label>
+    {{ recipe_form.recipe_name }}
+    <!-- Number of servings -->
+    <label>Servings</label>
+    {{ recipe_form.servings }}
+    <!-- A description of the recipe -->
+    <br><label>Description</label><br>
+    {{ recipe_form.description }}
+
+    <!-- A formset of a variable number of ingredient_forms -->
+    {{ ingredient_formset.management_form }}
+    {% for ingredient_form in ingredient_formset %}
+    	<!-- The class altered by jquery.formset.js -->
+        <div class="link-formset">
+            {{ ingredient_form }}
+        </div>
+    {% endfor %}
+    <br><button type="submit" class="btn btn-default" value="OK">Save this recipe
+    </button>
+</form>
+
+<script>
+    // Defining values used within jquery.formset.js
+    $('.link-formset').formset({
+        addText: '',
+        deleteText: '',
+        addCssClass: 'glyphicon glyphicon-plus',	
+        deleteCssClass: 'glyphicon glyphicon-remove',
+    });
+</script>
+
+{% endblock %}

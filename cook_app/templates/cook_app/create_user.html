@@ -1,0 +1,9 @@
+{% extends 'cook_app/base.html' %}
+<!-- html for creating user -->
+{% block content %}
+	<h1>New user</h1>
+	<form method="POST" class="post-form">{% csrf_token %}
+	    {{ form.as_p }}
+	    <button type="submit" class="save btn btn-default">Create new user account</button>
+	</form>
+{% endblock %}
