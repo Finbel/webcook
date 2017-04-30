@@ -17,7 +17,6 @@ def home(request):
     return render(request, 'cook_app/home.html', {})
 
 #get_recipe_structure is a help method that takes in the ammount of serving and the key of a recipe and then returns all the information needed to create a template for a recipe
-@login_required
 def get_recipe_structure(recipe_pk, servings):
     #gets the recipe based on the id
     recipe = Recipe.objects.get(id=recipe_pk)
@@ -72,8 +71,7 @@ def get_recipe_structure(recipe_pk, servings):
    
     recipe = {"name":name,"owner":owner,"description":description,"servings":servings,"ingredients":ingredient_structure,"calories":cal,"calories_per_serving":cal_per_serving}
     return recipe
-   
-@login_required
+
 def create_user(request):
     if request.method == "POST":
         form = UserCreationForm(request.POST)
