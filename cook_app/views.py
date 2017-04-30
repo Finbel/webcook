@@ -220,7 +220,7 @@ def add_ingredient(request):
         if form.is_valid():
             kcal = form.cleaned_data['calories']
             unit = form.cleaned_data['unit']
-            ingredient_name = form.cleaned_data['ingredient_name']
+            ingredient_name = form.cleaned_data['ingredient_name'].lower()
             ingredient, created = Ingredient.objects.get_or_create(name=ingredient_name)
             ingredient_unit, created = IngredientUnitToCal.objects.get_or_create(ingredient = ingredient, unit=unit)
             ingredient_unit.initialized = True
