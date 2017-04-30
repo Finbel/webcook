@@ -270,82 +270,83 @@ def reset_database(request):
     IngredientUnitToCal.objects.all().delete()
     Ingredient.objects.all().delete()
     #populates the database with units
-    units = ["dl","g","pieces","l","teaspoon","pinch","tablespoon","cup"]
-    #saves them to the database
-    for unit in units:
-        unit_model = Unit(unit=unit)
-        unit_model.save()
-    #creates several ingredients
-    ingredients = [
-        {"name":"milk","unit":"dl","cal":42},
-        {"name":"butter","unit":"g","cal":190},
-        {"name":"flour","unit":"dl","cal":30},
-        {"name":"sugar","unit":"tablespoon","cal":30},
-        {"name":"egg","unit":"pieces","cal":78},
-        {"name":"void shard","unit":"pinch","cal":None}
-        ]
-    #iterates over the ingredients 
-    for ingredient in ingredients:
-        #saves the ingredient with Model Ingredient
-        ingredient_model = Ingredient(name=ingredient["name"])
-        ingredient_model.save()
-        #gets the unit
-        unit = ingredient["unit"]
-        #gets the unit object from the database
-        unit_model = Unit.objects.get(unit=unit)
-        #saves the IngredientUnitToCal
-        converter = IngredientUnitToCal(
-            ingredient=ingredient_model,
-            unit=unit_model,
-            ingredient_unit_to_calories=ingredient["cal"]
+    if False:
+        units = ["dl","g","pieces","l","teaspoon","pinch","tablespoon","cup"]
+        #saves them to the database
+        for unit in units:
+            unit_model = Unit(unit=unit)
+            unit_model.save()
+        #creates several ingredients
+        ingredients = [
+            {"name":"milk","unit":"dl","cal":42},
+            {"name":"butter","unit":"g","cal":190},
+            {"name":"flour","unit":"dl","cal":30},
+            {"name":"sugar","unit":"tablespoon","cal":30},
+            {"name":"egg","unit":"pieces","cal":78},
+            {"name":"void shard","unit":"pinch","cal":None}
+            ]
+        #iterates over the ingredients 
+        for ingredient in ingredients:
+            #saves the ingredient with Model Ingredient
+            ingredient_model = Ingredient(name=ingredient["name"])
+            ingredient_model.save()
+            #gets the unit
+            unit = ingredient["unit"]
+            #gets the unit object from the database
+            unit_model = Unit.objects.get(unit=unit)
+            #saves the IngredientUnitToCal
+            converter = IngredientUnitToCal(
+                ingredient=ingredient_model,
+                unit=unit_model,
+                ingredient_unit_to_calories=ingredient["cal"]
+                )
+            converter.save()
+        #creates a recipe for a wondeful cookie
+        recipe = Recipe(title="Wonderful Cookie")
+        recipe.save()
+        #iterate three times
+        for i in range(0,3):
+            #gets a ingredient from the list
+            ingredient = ingredients[i]
+            #gets the object
+            ingredient_model = Ingredient.objects.get(name=ingredient["name"])
+            unit = Unit.objects.get(unit=ingredient["unit"])
+            amount = i*7+5
+            #creates the recipe ingredient
+            recipe_ingredient = RecipeIngredient(
+                quantity_per_serving=amount,
+                recipe=recipe,
+                ingredient=ingredient_model,
+                unit=unit
+                )
+            recipe_ingredient.save()
+        #creates an owner of the recipe with a comment
+        owner = RecipeOwner(
+            description="A wonderful cookie, for the entire family",
+            recipe = recipe,
+            owner = request.user
             )
-        converter.save()
-    #creates a recipe for a wondeful cookie
-    recipe = Recipe(title="Wonderful Cookie")
-    recipe.save()
-    #iterate three times
-    for i in range(0,3):
-        #gets a ingredient from the list
-        ingredient = ingredients[i]
-        #gets the object
-        ingredient_model = Ingredient.objects.get(name=ingredient["name"])
-        unit = Unit.objects.get(unit=ingredient["unit"])
-        amount = i*7+5
-        #creates the recipe ingredient
-        recipe_ingredient = RecipeIngredient(
-            quantity_per_serving=amount,
-            recipe=recipe,
-            ingredient=ingredient_model,
-            unit=unit
+        owner.save()
+        #same thing as above but with a cake
+        recipe = Recipe(title="Magnificent Cake")
+        recipe.save()
+        for i in range(3,6):
+            ingredient = ingredients[i]
+            ingredient_model = Ingredient.objects.get(name=ingredient["name"])
+            unit = Unit.objects.get(unit=ingredient["unit"])
+            amount = i*6+8
+            recipe_ingredient = RecipeIngredient(
+                quantity_per_serving=amount,
+                recipe=recipe,
+                ingredient=ingredient_model,
+                unit=unit
+                )
+            recipe_ingredient.save()
+     
+        owner = RecipeOwner(
+            description="The most magnificent cake you will ever see!",
+            recipe = recipe,
+            owner = request.user
             )
-        recipe_ingredient.save()
-    #creates an owner of the recipe with a comment
-    owner = RecipeOwner(
-        description="A wonderful cookie, for the entire family",
-        recipe = recipe,
-        owner = request.user
-        )
-    owner.save()
-    #same thing as above but with a cake
-    recipe = Recipe(title="Magnificent Cake")
-    recipe.save()
-    for i in range(3,6):
-        ingredient = ingredients[i]
-        ingredient_model = Ingredient.objects.get(name=ingredient["name"])
-        unit = Unit.objects.get(unit=ingredient["unit"])
-        amount = i*6+8
-        recipe_ingredient = RecipeIngredient(
-            quantity_per_serving=amount,
-            recipe=recipe,
-            ingredient=ingredient_model,
-            unit=unit
-            )
-        recipe_ingredient.save()
- 
-    owner = RecipeOwner(
-        description="The most magnificent cake you will ever see!",
-        recipe = recipe,
-        owner = request.user
-        )
-    owner.save()
+        owner.save()
     return redirect('home')
